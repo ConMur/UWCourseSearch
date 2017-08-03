@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <title>UWCourseSearch - Search</title>
+  <link rel="stylesheet" href="https://cdn.shoelace.style/1.0.0-beta5/shoelace.css">
+  <link rel="stylesheet" href="{{ css_url }}">
+</head>
+<body>
+  <div class="text-center">
+    <h1>Search</h1>
+  </div>
+
+  <div class="width-75 m-x-auto">
+    <form action="/results" method="post">
+
+      <div class="wrapper">
+        <div class="input-single">
+          <div class="width-100 left-element">
+            <label for="Term">Term</label>
+            <select id="Term">
+              <option value="Spring">Spring</option>
+              <option value="Fall">Fall</option>
+              <option value="Winter">Winter</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="input-single">
+          <div class="width-100 right-element">
+            <label for="Year">Year</label>
+            <select id="Year">
+              {% for term in term_codes %}
+              <option value="{{ term.id }}">{{ term.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-single">
+        <label for="CourseName">Course Name</label>
+        <select id="CourseName">
+          {% for code in course_codes %}
+          <option value="{{ code }}">{{ code }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="input-single">
+        <label for="CourseCode">Course Code</label>
+        <input type="text" id="CourseCode">
+      </div>
+
+      <div class="input-single">
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

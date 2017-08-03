@@ -1,0 +1,12 @@
+.wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.left-element {
+  padding-right: 0.5em;
+}
+
+.right-element {
+  padding-left: 0.5em;
+}

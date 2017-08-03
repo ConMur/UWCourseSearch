@@ -1,0 +1,1 @@
+from .uwcoursesearch import app
