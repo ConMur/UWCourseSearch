@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <title>UWCourseSearch - Results</title>
+  <link rel="stylesheet" href="https://cdn.shoelace.style/1.0.0-beta5/shoelace.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename="grid.css") }}">
+</head>
+<body>
+  <div class="text-center">
+    <h1>Results</h1>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <td>Class</td>
+        <td>Section</td>
+        <td>Capacity</td>
+        <td>Enrolled</td>
+      </tr>
+    </thead>
+    <tbdoy>
+      {% for result in data %}
+      <tr>
+        <td>{{ result.title }}</td>
+        <td>{{ result.section }}</td>
+        <td>{{ result.enrollment_capacity }}</td>
+        <td>{{ result.enrollment_total }}</td>
+      </td>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>

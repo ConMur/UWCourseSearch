@@ -3,7 +3,7 @@
 <head lang="en">
   <title>UWCourseSearch - Search</title>
   <link rel="stylesheet" href="https://cdn.shoelace.style/1.0.0-beta5/shoelace.css">
-  <link rel="stylesheet" href="{{ css_url }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename="grid.css") }}">
 </head>
 <body>
   <div class="text-center">
@@ -13,42 +13,29 @@
   <div class="width-75 m-x-auto">
     <form action="/results" method="post">
 
-      <div class="wrapper">
-        <div class="input-single">
-          <div class="width-100 left-element">
-            <label for="Term">Term</label>
-            <select id="Term">
-              <option value="Spring">Spring</option>
-              <option value="Fall">Fall</option>
-              <option value="Winter">Winter</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="input-single">
-          <div class="width-100 right-element">
-            <label for="Year">Year</label>
-            <select id="Year">
-              {% for term in term_codes %}
-              <option value="{{ term.id }}">{{ term.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
+      <div class="input-single">
+        <div class="width-100">
+          <label for="Term">Term</label>
+          <select name="Term" id="Term">
+            {% for term in term_codes %}
+            <option value="{{ term.id }}">{{ term.name }}</option>
+            {% endfor %}
+          </select>
         </div>
       </div>
 
       <div class="input-single">
         <label for="CourseName">Course Name</label>
-        <select id="CourseName">
-          {% for code in course_codes %}
-          <option value="{{ code }}">{{ code }}</option>
+        <select name="CourseName" id="CourseName">
+          {% for course in course_codes %}
+          <option value="{{ course.code }}">{{ course.text }}</option>
           {% endfor %}
         </select>
       </div>
 
       <div class="input-single">
         <label for="CourseCode">Course Code</label>
-        <input type="text" id="CourseCode">
+        <input name="CourseCode" type="text" id="CourseCode">
       </div>
 
       <div class="input-single">
