@@ -15,11 +15,11 @@ def get_course_codes():
     url = """https://api.uwaterloo.ca/v2/codes/subjects.json?key={}\
     """.format(app.config['API_KEY'])
 
-    response = _get_api_response(url)
+    response, error = _get_api_response(url)
 
     #Abort if there was an error
-    if(type(response) is str):
-        logging.error("Error getting API data: {}".format(response))
+    if(error is not ""):
+        logging.error("Error getting API data: {}".format(repr(response)))
         abort(500)
 
     course_codes = []
@@ -39,19 +39,21 @@ def get_course_codes():
 def get_term_codes():
     """
     Get a list of term codes and their names from the UW API.  Returns a
-    TermInfo object
+    TermInfo object and the ID of the current term
     """
 
     #Create the url to query the API with
     url = """https://api.uwaterloo.ca/v2/terms/list.json?key={}\
     """.format(app.config['API_KEY'])
 
-    response = _get_api_response(url)
+    response, error = _get_api_response(url)
 
     #Abort if there was an error
-    if(type(response) is str):
-        logging.error("Error getting API data: {}".format(response))
+    if(error is not ""):
+        logging.error("Error getting API data: {}".format(error))
         abort(500)
+
+    current_term = response['data']['current_term']
 
     term_codes = []
     #Add term codes and their names to the dictionary
@@ -65,7 +67,7 @@ def get_term_codes():
             term_codes.append(term_object)
 
     logging.info("Returning term codes")
-    return term_codes
+    return term_codes, current_term
 
 def search_courses(term, course_name, course_code):
     """
@@ -79,23 +81,24 @@ def search_courses(term, course_name, course_code):
     """
 
     #Create the url to query the API with
-    endpoint = """https://api.uwaterloo.ca/v2/terms/{}/{}/{}/schedule.json?key={}\
+    url = """https://api.uwaterloo.ca/v2/terms/{}/{}/{}/schedule.json?key={}\
     """.format(term, course_name, course_code, app.config['API_KEY'])
 
-    response = _get_api_response(url)
+    response, error = _get_api_response(url)
 
     #Return the error message if there is one
-    if(type(response) is str):
+    if(error is not ""):
         logging.error("Error getting UW API data: {}".format(response))
-        return response
+        return error
 
     return _parse_courses(response)
 
 def _get_api_response(url):
     """
     Queries the UWaterloo API using the given url (includes everything including
-    the API key).  Returns the json resonse if successful and an error message
-    if not.
+    the API key).  Returns the json resonse if and an error message.  The error
+    message is an empty string if nothing went wrong and non-empty if there
+    was an error
 
     url -- the url used to query the UW API with
     """
@@ -108,10 +111,7 @@ def _get_api_response(url):
     #Determine if there is an error
     error_message = _check_api_error_message(json)
 
-    if(error_message is not ""):
-        return json
-    else:
-        return error_message
+    return json, error_message
 
 def _check_api_error_message(json_data):
     """

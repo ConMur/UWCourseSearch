@@ -8,11 +8,11 @@ def index():
 
 @app.route('/search')
 def search():
-    term_codes = uw_api_service.get_term_codes()
+    term_codes, current_term = uw_api_service.get_term_codes()
     course_codes = uw_api_service.get_course_codes()
 
     return render_template("search.html", term_codes=term_codes,
-                            course_codes=course_codes)
+                            current_term=current_term, course_codes=course_codes)
 
 @app.route('/results', methods=['POST'])
 def results():
