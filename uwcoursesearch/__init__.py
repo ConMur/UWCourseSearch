@@ -12,6 +12,6 @@ app.config.update(dict(
     SECRET_KEY='development key',
 ))
 
-logging.basicConfig(filename="serverlog.log", level=logging.INFO)
+#logging.basicConfig(filename="serverlog.log", level=logging.INFO)
 
 import uwcoursesearch.views
