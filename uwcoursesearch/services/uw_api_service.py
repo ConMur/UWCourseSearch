@@ -1,30 +1,30 @@
 import requests
 from uwcoursesearch import app
-from flask import flash
+from flask import flash, abort
 from uwcoursesearch.helpers.CourseData import Course, Classes, CourseInfo, Reserves, TermInfo
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 def get_course_codes():
     """
     Get a list of course codes and their definitions from the UW API
     """
     #Create the url to query the API with
-    endpoint = """https://api.uwaterloo.ca/v2/codes/subjects.json?key={}\
+    url = """https://api.uwaterloo.ca/v2/codes/subjects.json?key={}\
     """.format(app.config['API_KEY'])
 
-    #Query the API
-    json = requests.get(endpoint).json()
+    response, error = _get_api_response(url)
 
-    #Determine if there is an error
-    error_message = _check_api_error_message(json)
-
-    if(error_message is not ""):
-        flash(error_message)
+    #Abort if there was an error
+    if(error is not ""):
+        logging.error("Error getting API data: {}".format(repr(response)))
         abort(500)
 
     course_codes = []
     #Add course codes and their description to the dictionary
-    for course in json['data']:
+    for course in response['data']:
         course_code = course['subject']
         course_desc = course['description']
 
@@ -33,32 +33,32 @@ def get_course_codes():
         course_object = CourseInfo(course_code, text)
         course_codes.append(course_object)
 
+    logging.info("Returning course codes")
     return course_codes
 
 def get_term_codes():
     """
     Get a list of term codes and their names from the UW API.  Returns a
-    TermInfo object
+    TermInfo object and the ID of the current term
     """
 
     #Create the url to query the API with
-    endpoint = """https://api.uwaterloo.ca/v2/terms/list.json?key={}\
+    url = """https://api.uwaterloo.ca/v2/terms/list.json?key={}\
     """.format(app.config['API_KEY'])
 
-    #Query the API
-    json = requests.get(endpoint).json()
+    response, error = _get_api_response(url)
 
-    #Determine if there is an error
-    error_message = _check_api_error_message(json)
-
-    if(error_message is not ""):
-        flash(error_message)
+    #Abort if there was an error
+    if(error is not ""):
+        logging.error("Error getting API data: {}".format(error))
         abort(500)
+
+    current_term = response['data']['current_term']
 
     term_codes = []
     #Add term codes and their names to the dictionary
-    for year in json['data']['listings']:
-        data = json['data']['listings'][year]
+    for year in response['data']['listings']:
+        data = response['data']['listings'][year]
         for term in data:
             term_code = term['id']
             term_name = term['name']
@@ -66,7 +66,8 @@ def get_term_codes():
             term_object = TermInfo(term_code, term_name)
             term_codes.append(term_object)
 
-    return term_codes
+    logging.info("Returning term codes")
+    return term_codes, current_term
 
 def search_courses(term, course_name, course_code):
     """
@@ -80,22 +81,68 @@ def search_courses(term, course_name, course_code):
     """
 
     #Create the url to query the API with
-    endpoint = """https://api.uwaterloo.ca/v2/terms/{}/{}/{}/schedule.json?key={}\
+    url = """https://api.uwaterloo.ca/v2/terms/{}/{}/{}/schedule.json?key={}\
     """.format(term, course_name, course_code, app.config['API_KEY'])
 
+    response, error = _get_api_response(url)
+
+    #Return the error message if there is one
+    if(error is not ""):
+        logging.error("Error getting UW API data: {}".format(response))
+        return error
+
+    return _parse_courses(response)
+
+def _get_api_response(url):
+    """
+    Queries the UWaterloo API using the given url (includes everything including
+    the API key).  Returns the json resonse if and an error message.  The error
+    message is an empty string if nothing went wrong and non-empty if there
+    was an error
+
+    url -- the url used to query the UW API with
+    """
+
     #Query the API
-    json = requests.get(endpoint).json()
+    json = requests.get(url).json()
+
+    logging.info("Queried the UW API at url: {}".format(url))
 
     #Determine if there is an error
     error_message = _check_api_error_message(json)
 
-    if(error_message is not ""):
+    return json, error_message
+
+def _check_api_error_message(json_data):
+    """
+    Returns an error if one occurred and an empty string if the response
+    was successful
+
+    json_data -- the data returned from the UW API query
+    """
+    #Ensure the response was received
+    status_code = json_data['meta']['status']
+
+    logging.info("Status code from UW API response is: {}".format(status_code))
+
+    #Notify  if there are errors
+    if status_code is not 200:
+        error_message = json_data['meta']['message']
         return error_message
 
+    return ""
+
+def _parse_courses(response):
+    """
+    Extracts the course data from the provided json response into a list of
+    Course objects
+
+    response -- the json response from the UW API
+    """
     data = []
 
     #Parse json response
-    for course in json['data']:
+    for course in response['data']:
         reserves_data = course['reserves']
         reserves = []
         for reserve in reserves_data:
@@ -125,22 +172,5 @@ def search_courses(term, course_name, course_code):
 
         data.append(course_object)
 
+    logging.info("Returning parsed course data")
     return data
-
-
-def _check_api_error_message(json_data):
-    """
-    Returns an error if one occurred and an empty string if the response
-    was successful
-
-    json_data -- the data returned from the API query
-    """
-    #Ensure the response was received
-    status_code = json_data['meta']['status']
-
-    #Notify  if there are errors
-    if status_code is not 200:
-        error_message = json_data['meta']['message']
-        return error_message
-
-    return ""

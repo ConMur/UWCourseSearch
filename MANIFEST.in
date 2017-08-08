@@ -1,2 +1,4 @@
 graft uwcoursesearch/templates
 graft uwcoursesearch/static
+graft uwcoursesearch/helpers
+graft uwcoursesearch/services

@@ -18,7 +18,11 @@
           <label for="Term">Term</label>
           <select name="Term" id="Term">
             {% for term in term_codes %}
-            <option value="{{ term.id }}">{{ term.name }}</option>
+              {% if term.id|string() == current_term|string() %}
+              <option value="{{ term.id }}" selected="selected">{{ term.name }}</option>
+              {% else %}
+              <option value="{{ term.id }}">{{ term.name }}</option>
+              {% endif %}
             {% endfor %}
           </select>
         </div>
