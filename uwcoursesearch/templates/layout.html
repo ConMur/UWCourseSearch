@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  {% block title %}{% endblock %}
+  <link rel="stylesheet" href="https://cdn.shoelace.style/1.0.0-beta5/shoelace.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename="grid.css") }}">
+</head>
+<body>
+  <div class="width-75 m-x-auto">
+    {%block body %}
+    {% endblock %}
+  </div>
+</body>
+</html>

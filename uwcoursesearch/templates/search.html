@@ -1,51 +1,45 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-  <title>UWCourseSearch - Search</title>
-  <link rel="stylesheet" href="https://cdn.shoelace.style/1.0.0-beta5/shoelace.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename="grid.css") }}">
-</head>
-<body>
-  <div class="text-center">
-    <h1>Search</h1>
+{% extends "layout.html" %}
+{% block title %}
+<title>UWCourseSearch - Search</title>
+{% endblock %}
+
+{% block body %}
+<div class="text-center">
+  <h1>Search</h1>
+</div>
+
+<form action="/results" method="post">
+  <div class="input-single">
+    <div class="width-100">
+      <label for="Term">Term</label>
+      <select name="Term" id="Term">
+      {% for term in term_codes %}
+        {% if term.id|string() == current_term|string() %}
+        <option value="{{ term.id }}" selected="selected">{{ term.name }}</option>
+          {% else %}
+          <option value="{{ term.id }}">{{ term.name }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
   </div>
 
-  <div class="width-75 m-x-auto">
-    <form action="/results" method="post">
-
-      <div class="input-single">
-        <div class="width-100">
-          <label for="Term">Term</label>
-          <select name="Term" id="Term">
-            {% for term in term_codes %}
-              {% if term.id|string() == current_term|string() %}
-              <option value="{{ term.id }}" selected="selected">{{ term.name }}</option>
-              {% else %}
-              <option value="{{ term.id }}">{{ term.name }}</option>
-              {% endif %}
-            {% endfor %}
-          </select>
-        </div>
-      </div>
-
-      <div class="input-single">
-        <label for="CourseName">Course Name</label>
-        <select name="CourseName" id="CourseName">
-          {% for course in course_codes %}
-          <option value="{{ course.code }}">{{ course.text }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div class="input-single">
-        <label for="CourseCode">Course Code</label>
-        <input name="CourseCode" type="text" id="CourseCode">
-      </div>
-
-      <div class="input-single">
-        <button type="submit">Submit</button>
-      </div>
-    </form>
+  <div class="input-single">
+    <label for="CourseName">Course Name</label>
+    <select name="CourseName" id="CourseName">
+      {% for course in course_codes %}
+      <option value="{{ course.code }}">{{ course.text }}</option>
+      {% endfor %}
+    </select>
   </div>
-</body>
-</html>
+
+  <div class="input-single">
+    <label for="CourseCode">Course Code</label>
+    <input name="CourseCode" type="text" id="CourseCode">
+  </div>
+
+  <div class="input-single">
+    <button type="submit">Submit</button>
+  </div>
+</form>
+{% endblock %}
