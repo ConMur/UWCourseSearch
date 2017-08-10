@@ -88,7 +88,7 @@ def search_courses(term, course_name, course_code):
 
     #Return the error message if there is one
     if(error is not ""):
-        logging.error("Error getting UW API data: {}".format(response))
+        logging.error("Error getting UW API data: {}".format(error))
         return error
 
     return _parse_courses(response)

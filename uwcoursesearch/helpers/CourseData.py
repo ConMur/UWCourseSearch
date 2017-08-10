@@ -3,7 +3,6 @@ class CourseInfo:
         self.code = course_code
         self.text = text
 
-
 class TermInfo:
     """
     Represents a term.  Contains the id of the term (eg. 1179) and the name
@@ -12,7 +11,7 @@ class TermInfo:
     def __init__(self, term_id, term_name):
         self.id = term_id
         self.name = term_name
-        
+
 class Reserves:
     def __init__(self, reserve_group, enrollment_capacity, enrollment_total):
         self.reserve_group = reserve_group

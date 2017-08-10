@@ -1,16 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-  <title>UWCourseSearch</title>
-  <link rel="stylesheet" href="https://cdn.shoelace.style/1.0.0-beta5/shoelace.css">
-</head>
-<body>
-  <div class="text-center">
-    <h1>UWCourseSearch</h1>
-  </div>
+{% extends "layout.html" %}
+{% block title %}
+<title>UWCourseSearch</title>
+{% endblock %}
 
-  <div class="width-75 m-x-auto">
-    <p>Click <a href="/search">here</a> to search</p>
-  </div>
-</body>
-</html>
+{% block body %}
+<div class="text-center">
+  <h1>UWCourseSearch</h1>
+</div>
+
+<p>Click <a href="/search">here</a> to search</p>
+{% endblock %}
